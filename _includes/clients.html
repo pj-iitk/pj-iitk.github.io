@@ -1,0 +1,43 @@
+<section class="section-quotes">
+
+  <h3 id="quotes">quotes</h3>
+
+  <div class="quotes-mobile-nav">
+    {% for quote in site.data.settings.quotes %}
+        <span class="quote-button {% if forloop.first %}active-quote{% endif %}"></span>
+    {% endfor %}
+  </div>
+
+  <div class="quotes-belt">
+    {% for quote in site.data.settings.quotes %}
+      <div class="quote-unit {% if forloop.first %}active-quote{% endif %}">
+
+        <figure class="quote-face">
+          <img src="{{ site.github.url }}/assets/img/quotes/{{ quote.avatar }}" alt="quote-face">
+          <figcaption>
+            <strong class="quote-name">{{ quote.name }}</strong>
+            <em class="quote-title">{{ quote.title }}</em>
+          </figcaption>
+        </figure>
+
+        <div class="quote-content">
+          <div class="quote-quote-mark">{% include icons/icon-quote-mark.html %}</div>
+          {{ quote.quote }}
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+
+  <div class="quote-controls">
+    <div class="quote-control-next">{% include icons/icon-next.html %}</div>
+    <div class="quote-control-prev">{% include icons/icon-prev.html %}</div>
+  </div>
+
+  <div class="quotes-logos">
+    {% for quote in site.data.settings.quotes %}
+        <img class="quote-logo {% if forloop.first %}active-quote{% endif %}" src="{{ site.github.url }}/assets/img/quotes/{{ quote.logo }}" align="{{ quote.logo }}">
+    {% endfor %}
+  </div>
+
+</section>
