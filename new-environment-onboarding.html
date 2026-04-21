@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Environment Onboarding — Claude Agent Skill</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --warn: #d29922;
+      --danger: #f85149;
+      --purple: #bc8cff;
+      --tag-bg: #1f2937;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── HERO ─────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #0d1117 0%, #1a1f35 50%, #0d1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 64px 40px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(88,166,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(88,166,255,0.12);
+      border: 1px solid rgba(88,166,255,0.3);
+      color: var(--accent);
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 42px; font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      color: var(--muted); font-size: 18px;
+      max-width: 560px; margin: 0 auto 28px;
+    }
+    .problem-banner {
+      margin: 0 auto 32px;
+      max-width: 700px;
+      background: rgba(248,81,73,0.07);
+      border: 1px solid rgba(248,81,73,0.2);
+      border-radius: 10px;
+      padding: 16px 22px;
+      text-align: left;
+      font-size: 13px; color: var(--muted); line-height: 1.8;
+    }
+    .problem-banner .lead { color: var(--danger); font-weight: 700; }
+    .problem-banner code {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 3px; padding: 1px 5px;
+      color: var(--purple); font-size: 12px;
+      font-family: 'SF Mono', Consolas, monospace;
+    }
+    .problem-banner .fix { color: var(--accent2); font-weight: 600; display: inline-block; margin-top: 6px; }
+    .hero-stats {
+      display: flex; gap: 32px;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 30px; font-weight: 700; color: var(--accent); }
+    .hero-stat .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── LAYOUT ───────────────────────────────────────────── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
+    section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+    section:last-child { border-bottom: none; }
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    .section-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .section-desc { color: var(--muted); margin-bottom: 36px; max-width: 640px; }
+
+    /* ── CARDS ────────────────────────────────────────────── */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px 22px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card-icon { font-size: 22px; margin-bottom: 10px; }
+    .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── TIMELINE ─────────────────────────────────────────── */
+    .timeline { position: relative; padding-left: 32px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent), var(--purple), var(--accent2));
+    }
+    .phase { position: relative; margin-bottom: 40px; }
+    .phase:last-child { margin-bottom: 0; }
+    .phase-dot {
+      position: absolute; left: -27px; top: 4px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--bg);
+      box-shadow: 0 0 0 3px rgba(88,166,255,0.2);
+    }
+    .phase-dot.purple { background: var(--purple); box-shadow: 0 0 0 3px rgba(188,140,255,0.2); }
+    .phase-dot.green  { background: var(--accent2); box-shadow: 0 0 0 3px rgba(63,185,80,0.2); }
+    .phase-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .phase-num {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 2px 9px;
+      font-size: 11px; font-weight: 700; color: var(--muted);
+    }
+    .phase-title { font-size: 18px; font-weight: 600; }
+    .steps { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .step { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      min-width: 24px; height: 24px;
+      background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.25);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 1px;
+    }
+    .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .step-content p { font-size: 13px; color: var(--muted); }
+    .step-content code {
+      font-size: 12px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 1px 6px; color: var(--purple);
+      font-family: 'SF Mono', Consolas, monospace;
+    }
+
+    /* ── PITFALLS ─────────────────────────────────────────── */
+    .pitfalls { display: grid; gap: 14px; }
+    .pitfall {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 4px solid var(--danger); border-radius: 8px; padding: 16px 18px;
+    }
+    .pitfall.warn { border-left-color: var(--warn); }
+    .pitfall-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .pitfall-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 4px;
+      background: rgba(248,81,73,0.15); color: var(--danger);
+    }
+    .pitfall.warn .pitfall-tag { background: rgba(210,153,34,0.15); color: var(--warn); }
+    .pitfall h4 { font-size: 15px; font-weight: 600; }
+    .pitfall .symptom { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .pitfall .fix {
+      font-size: 13px; background: var(--surface2);
+      border-radius: 6px; padding: 8px 12px; border: 1px solid var(--border);
+    }
+    .pitfall .fix strong { color: var(--accent2); }
+
+    /* ── ARTIFACTS ────────────────────────────────────────── */
+    .artifacts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .artifact { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; }
+    .artifact-icon { font-size: 20px; margin-bottom: 8px; }
+    .artifact h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .artifact ul { list-style: none; padding: 0; }
+    .artifact ul li { font-size: 12px; color: var(--muted); padding: 2px 0 2px 14px; position: relative; }
+    .artifact ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent); }
+
+    /* ── SERVICE TYPES ────────────────────────────────────── */
+    .service-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .stype {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 20px;
+    }
+    .stype-badge {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 3px 10px; border-radius: 4px; margin-bottom: 10px;
+    }
+    .stype-badge.api    { background: rgba(88,166,255,0.15); color: var(--accent); }
+    .stype-badge.worker { background: rgba(188,140,255,0.15); color: var(--purple); }
+    .stype-badge.both   { background: rgba(210,153,34,0.12); color: var(--warn); }
+    .stype-badge.full   { background: rgba(63,185,80,0.15); color: var(--accent2); }
+    .stype h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .stype ul { list-style: none; padding: 0; }
+    .stype ul li { font-size: 12px; color: var(--muted); padding: 2px 0 2px 14px; position: relative; }
+    .stype ul li::before { content: '·'; position: absolute; left: 3px; color: var(--muted); }
+
+    /* ── IMPACT ───────────────────────────────────────────── */
+    .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .impact-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .impact-card h3 { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+    .impact-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+    .impact-item:last-child { margin-bottom: 0; }
+    .impact-dot { min-width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; }
+    .impact-dot.red   { background: var(--danger); }
+    .impact-dot.green { background: var(--accent2); }
+    .impact-item p { font-size: 14px; }
+
+    /* ── ROADMAP ──────────────────────────────────────────── */
+    .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .roadmap-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px; position: relative; overflow: hidden;
+    }
+    .roadmap-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .roadmap-item.now::before   { background: var(--accent); }
+    .roadmap-item.next::before  { background: var(--warn); }
+    .roadmap-item.later::before { background: var(--purple); }
+    .roadmap-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .roadmap-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .roadmap-item p  { font-size: 13px; color: var(--muted); }
+
+    /* ── CODE BLOCK ───────────────────────────────────────── */
+    pre {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 16px;
+      font-family: 'SF Mono', Consolas, monospace; font-size: 12.5px;
+      color: var(--text); overflow-x: auto; line-height: 1.7;
+    }
+    pre .c  { color: var(--muted); }
+    pre .k  { color: var(--accent); }
+    pre .s  { color: var(--accent2); }
+    pre .v  { color: var(--purple); }
+
+    /* ── FOOTER ───────────────────────────────────────────── */
+    footer {
+      text-align: center; padding: 32px 40px;
+      color: var(--muted); font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 40px 20px; }
+      .hero h1 { font-size: 28px; }
+      .container { padding: 0 20px; }
+      .impact-grid, .roadmap { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─────────────────── HERO ─────────────────────────────── -->
+<div class="hero">
+  <div class="hero-badge">Claude Agent Skill</div>
+  <h1>New Environment<br><span>Onboarding</span></h1>
+  <p>From zero to fully configured environment — configs, pipelines, secrets, DNS — in a single session.</p>
+
+  <div class="problem-banner">
+    <span class="lead">You know the drill when a new environment lands:</span><br>
+    Dig through old PRs &rarr; copy-paste configs &rarr; forget to override a critical placeholder &rarr; deployment fails &rarr; canary misconfigured &rarr; start over for every service.
+    <br><span class="fix">Now Claude runs all of it.</span>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">7</div><div class="label">File Types Generated</div></div>
+    <div class="hero-stat"><div class="num">4</div><div class="label">Service Templates</div></div>
+    <div class="hero-stat"><div class="num">6</div><div class="label">Pitfalls Prevented</div></div>
+    <div class="hero-stat"><div class="num">1 session</div><div class="label">vs. days of manual work</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ──────────── WHAT IS IT ─────────────────────────────── -->
+  <section>
+    <div class="section-label">Overview</div>
+    <div class="section-title">What is this skill?</div>
+    <div class="section-desc">An interactive Claude agent skill that collects environment inputs and writes every required file to disk in one session — runtime configs, Kubernetes manifests, CI/CD pipelines, secrets commands, DNS records, and deployment ordering.</div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">💬</div>
+        <h3>Guided Q&amp;A</h3>
+        <p>Collects environment ID, cluster name, service list, DB endpoints, message broker addresses, and service host mappings through targeted questions — no prior context needed.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📁</div>
+        <h3>Writes Files to Disk</h3>
+        <p>Generates all config files and saves them directly to the correct repo paths. No copy-paste, no manual templating, no missed overrides.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔀</div>
+        <h3>Service-Type Aware</h3>
+        <p>Branches on service deployment type: API-only, worker-only, API+worker, or API+worker+DB. Each path generates the right file subset with the right structure.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <h3>Pitfalls Baked In</h3>
+        <p>Known failure modes from real environment onboardings are encoded as guardrails — wrong placeholders, misconfigured canaries, UUID mismatches all prevented at generation time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────── SERVICE TYPES ───────────────────────────── -->
+  <section>
+    <div class="section-label">Templates</div>
+    <div class="section-title">Service Type Templates</div>
+    <div class="section-desc">The skill detects the deployment type for each service and generates the correct file set. Four templates cover all cases.</div>
+    <div class="service-types">
+      <div class="stype">
+        <span class="stype-badge api">API Only</span>
+        <h4>Stateless API Service</h4>
+        <ul>
+          <li>Runtime config (DB, cache, messaging)</li>
+          <li>Kubernetes deployment + ingress</li>
+          <li>gRPC + HTTP pipeline</li>
+          <li>Canary analysis config</li>
+          <li>DNS: ingress + internal gRPC records</li>
+        </ul>
+      </div>
+      <div class="stype">
+        <span class="stype-badge worker">Worker Only</span>
+        <h4>Async Event Consumer</h4>
+        <ul>
+          <li>Runtime config (messaging, DB if needed)</li>
+          <li>Kubernetes deployment (no ingress)</li>
+          <li>Worker-only pipeline (no canary HTTP check)</li>
+          <li>commit_txt_host empty, failPipeline=false</li>
+          <li>Correct container name in deployments_config</li>
+        </ul>
+      </div>
+      <div class="stype">
+        <span class="stype-badge both">API + Worker</span>
+        <h4>Hybrid Service</h4>
+        <ul>
+          <li>Runtime config for both API + consumer</li>
+          <li>Two Kubernetes deployments</li>
+          <li>Pipeline with separate API + worker stages</li>
+          <li>Ingress for API, no ingress for worker</li>
+          <li>Full DNS record set</li>
+        </ul>
+      </div>
+      <div class="stype">
+        <span class="stype-badge full">API + Worker + DB</span>
+        <h4>Full-Stack Service</h4>
+        <ul>
+          <li>All of API+Worker plus DB migration job</li>
+          <li>DB credentials in secrets</li>
+          <li>Migration pipeline stage before deploy</li>
+          <li>Schema and connection pool config</li>
+          <li>DB port validation (proxy vs direct)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────── PHASES ──────────────────────────────────── -->
+  <section>
+    <div class="section-label">Process</div>
+    <div class="section-title">Onboarding Phases</div>
+    <div class="section-desc">Two phases: environment-level infrastructure, then per-service configuration.</div>
+    <div class="timeline">
+
+      <div class="phase">
+        <div class="phase-dot"></div>
+        <div class="phase-header">
+          <span class="phase-num">PHASE 1</span>
+          <span class="phase-title">Environment &amp; Infrastructure Setup</span>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Cluster Registration</h4>
+              <p>Register the new cluster with your deployment orchestrator so pipelines can target it. Generates the cluster config entry.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Network Infrastructure</h4>
+              <p>Security groups, VPC peering, subnet routing for the new environment. DB proxy / load balancer setup if required by the environment's access pattern.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Secrets Bootstrap</h4>
+              <p>Provision DB credentials, message broker credentials, and service tokens into secrets management. Skill generates ready-to-run <code>credstash put</code> commands for all services.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>DNS Records</h4>
+              <p>Create DNS entries for each service's internal gRPC host, external ingress, and concierge endpoint. Three record types per service, generated in bulk.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-dot purple"></div>
+        <div class="phase-header">
+          <span class="phase-num">PHASE 2</span>
+          <span class="phase-title">Per-Service Configuration</span>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Runtime Config</h4>
+              <p>Service-specific config file: DB connection, message broker addresses, peer service hosts, cache config, feature flags, org/tenant IDs. Auto-wired with environment name, region, and topic names.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Kubernetes Manifest</h4>
+              <p>Namespace, replicas, HPA bounds, resource limits, ingress class/host. Critical overrides like <code>grpc_internal_host</code> always set explicitly — never left as a template placeholder.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Deployment Pipeline</h4>
+              <p>Canary analysis config with correct lifetime. Pipeline JSON with UUID matching the canary config. Both files generated atomically — UUID mismatch is structurally impossible.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Orchestrator Entry</h4>
+              <p>Add service stage to the master deploy orchestrator in the correct dependency order. Pipeline IDs marked for post-sync verification.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-dot green"></div>
+        <div class="phase-header">
+          <span class="phase-num">PHASE 3</span>
+          <span class="phase-title">Verify &amp; Deploy</span>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Raise PRs</h4>
+              <p>One PR per repo: runtime configs, Kubernetes manifests, deployment pipelines, infrastructure/DNS. All files already correct — review and merge.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Post-Sync Verification</h4>
+              <p>After the deployment system syncs pipelines, verify orchestrator stage IDs match the assigned pipeline IDs. Update if needed.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Ordered First-Install Deploy</h4>
+              <p>Deploy services in dependency order — services with no upstream dependencies first, consumers and aggregators last. The skill generates this order based on your service graph.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ──────────── ARTIFACTS ───────────────────────────────── -->
+  <section>
+    <div class="section-label">Output</div>
+    <div class="section-title">What gets generated</div>
+    <div class="section-desc">All files written directly to the correct repo paths. Nothing manual.</div>
+    <div class="artifacts-grid">
+      <div class="artifact">
+        <div class="artifact-icon">⚙️</div>
+        <h4>Runtime Configs</h4>
+        <ul>
+          <li>4 service-type templates</li>
+          <li>Auto-wired: region, app_env, topics</li>
+          <li>DB, cache, message broker config</li>
+          <li>Peer service host addresses</li>
+          <li>Org / tenant IDs</li>
+        </ul>
+      </div>
+      <div class="artifact">
+        <div class="artifact-icon">🗂️</div>
+        <h4>Kubernetes Manifests</h4>
+        <ul>
+          <li>Namespace and service name</li>
+          <li>Replica count + HPA config</li>
+          <li>Ingress host + class</li>
+          <li>grpc_internal_host (always explicit)</li>
+          <li>Resource limits / requests</li>
+        </ul>
+      </div>
+      <div class="artifact">
+        <div class="artifact-icon">🚀</div>
+        <h4>Deployment Pipelines</h4>
+        <ul>
+          <li>Canary config (lifetime ≥ 1 min)</li>
+          <li>Pipeline JSON (UUID-linked to canary)</li>
+          <li>Baseline + canary + stable stages</li>
+          <li>failPipeline set correctly per type</li>
+        </ul>
+      </div>
+      <div class="artifact">
+        <div class="artifact-icon">🔑</div>
+        <h4>Secrets Commands</h4>
+        <ul>
+          <li>Ready-to-run credstash put commands</li>
+          <li>DB credentials per service</li>
+          <li>Broker SCRAM credentials</li>
+          <li>Service-specific tokens</li>
+        </ul>
+      </div>
+      <div class="artifact">
+        <div class="artifact-icon">🌐</div>
+        <h4>DNS Records</h4>
+        <ul>
+          <li>Internal record (intra-cluster gRPC)</li>
+          <li>Concierge record (external access)</li>
+          <li>gRPC record (service mesh)</li>
+        </ul>
+      </div>
+      <div class="artifact">
+        <div class="artifact-icon">🎯</div>
+        <h4>Orchestrator Entry</h4>
+        <ul>
+          <li>Stage added to deploy orchestrator</li>
+          <li>Dependency-ordered placement</li>
+          <li>Pipeline ID placeholder (verified post-sync)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────── PITFALLS ─────────────────────────────────── -->
+  <section>
+    <div class="section-label">Guardrails</div>
+    <div class="section-title">Pitfalls prevented at generation time</div>
+    <div class="section-desc">These are real failure modes from production environment onboardings. Every one is encoded as a guardrail — the skill makes them structurally impossible to hit.</div>
+    <div class="pitfalls">
+
+      <div class="pitfall">
+        <div class="pitfall-header">
+          <span class="pitfall-tag">Critical</span>
+          <h4>Critical placeholder left unsubstituted</h4>
+        </div>
+        <p class="symptom">Symptom: Service starts cleanly but all calls to peer services fail at runtime with DNS errors or timeouts. The template variable was copied from another environment and never replaced with the real hostname.</p>
+        <div class="fix"><strong>Guardrail:</strong> Skill writes the actual resolved hostname at generation time. No template variables are left in output files — every value is concrete.</div>
+      </div>
+
+      <div class="pitfall">
+        <div class="pitfall-header">
+          <span class="pitfall-tag">Critical</span>
+          <h4>Canary lifetime = 0 exits instantly</h4>
+        </div>
+        <p class="symptom">Symptom: Canary analysis stage completes in seconds and reports "insufficient data". The canary was never actually evaluated — it exited before collecting any metrics.</p>
+        <div class="fix"><strong>Guardrail:</strong> Skill enforces <code>canary_lifetime_mins ≥ 1</code>. Value 0 is rejected at generation time with an explanation.</div>
+      </div>
+
+      <div class="pitfall">
+        <div class="pitfall-header">
+          <span class="pitfall-tag">Critical</span>
+          <h4>UUID mismatch between canary config and pipeline</h4>
+        </div>
+        <p class="symptom">Symptom: Pipeline fails to resolve the canary config at deploy time — "config not found". Caused by copying files from another service and updating only one of the two UUID references.</p>
+        <div class="fix"><strong>Guardrail:</strong> Both files are generated in the same call with a single UUID written to both atomically. Mismatch is structurally impossible.</div>
+      </div>
+
+      <div class="pitfall warn">
+        <div class="pitfall-header">
+          <span class="pitfall-tag warn">Warning</span>
+          <h4>Worker-only service references wrong container name</h4>
+        </div>
+        <p class="symptom">Symptom: Pipeline's commit-check stage fails or targets the wrong container for worker-only services. The deployments_config was copied from an API service and still references the api container.</p>
+        <div class="fix"><strong>Guardrail:</strong> Skill detects worker-only services and sets the correct container name, clears the commit host, and sets <code>failPipeline: false</code> for the commit-check stage.</div>
+      </div>
+
+      <div class="pitfall warn">
+        <div class="pitfall-header">
+          <span class="pitfall-tag warn">Warning</span>
+          <h4>Orchestrator pipeline IDs stale after sync</h4>
+        </div>
+        <p class="symptom">Symptom: Master deploy orchestrator references old or wrong pipeline IDs after the deployment system syncs new pipelines. The orchestrator runs but triggers the wrong pipelines.</p>
+        <div class="fix"><strong>Guardrail:</strong> Skill marks all orchestrator IDs as "verify post-sync" with clear inline comments. A checklist step is generated as part of the deploy phase.</div>
+      </div>
+
+      <div class="pitfall">
+        <div class="pitfall-header">
+          <span class="pitfall-tag">Critical</span>
+          <h4>DB port unreachable in new environment</h4>
+        </div>
+        <p class="symptom">Symptom: Service pods crash on startup with a DB connection timeout. The config was copied from an existing environment that routes through a DB proxy on a non-standard port — the proxy isn't set up for the new environment yet.</p>
+        <div class="fix"><strong>Guardrail:</strong> Skill asks "Is the DB proxy configured for this environment?" and selects the correct port accordingly. Adds a TODO comment if proxy setup is pending.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ──────────── IMPACT ───────────────────────────────────── -->
+  <section>
+    <div class="section-label">Impact</div>
+    <div class="section-title">Before vs After</div>
+    <div class="section-desc">What the difference looks like when onboarding a multi-service environment.</div>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <h3>Manual Onboarding</h3>
+        <div class="impact-item">
+          <div class="impact-dot red"></div>
+          <p>Days of engineering time spread across multiple engineers</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot red"></div>
+          <p>Same pitfalls hit repeatedly — each requiring investigation and redeployment</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot red"></div>
+          <p>Config files scattered across multiple repos, written independently</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot red"></div>
+          <p>No enforced service ordering — cascading startup failures</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot red"></div>
+          <p>Errors discovered only at deploy time — too late to catch without a full run</p>
+        </div>
+      </div>
+      <div class="impact-card">
+        <h3>With This Skill</h3>
+        <div class="impact-item">
+          <div class="impact-dot green"></div>
+          <p>Single session generates all files across all repos for all services</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot green"></div>
+          <p>All known pitfalls are guardrails — prevented before files are written</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot green"></div>
+          <p>Files written to correct paths automatically — no copy-paste drift</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot green"></div>
+          <p>Dependency-ordered deploy sequence generated alongside the configs</p>
+        </div>
+        <div class="impact-item">
+          <div class="impact-dot green"></div>
+          <p>Review + PR is all that's left — all content already correct and consistent</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────── HOW TO USE ───────────────────────────────── -->
+  <section>
+    <div class="section-label">Usage</div>
+    <div class="section-title">How to run it</div>
+    <div class="section-desc">Load the skill in your Claude Code session and follow the prompts.</div>
+    <pre><span class="c"># In your Claude Code session</span>
+<span class="k">/new-environment-onboarding</span>
+
+<span class="c"># Claude will ask:</span>
+<span class="s">? Environment ID:           </span><span class="v">my-cell-prod</span>
+<span class="s">? Environment name:         </span><span class="v">prod</span>
+<span class="s">? Cluster name:             </span><span class="v">my-cluster-blue</span>
+<span class="s">? DB host:                  </span><span class="v">db.internal.myservice.vpc</span>
+<span class="s">? DB port (direct/proxy):   </span><span class="v">5432  # or non-standard proxy port</span>
+<span class="s">? Message broker addresses: </span><span class="v">broker-1.internal:9096, broker-2.internal:9096</span>
+<span class="s">? Internal service domain:  </span><span class="v">int.prod.myservice.com</span>
+<span class="s">? Org / tenant ID:          </span><span class="v">12345</span>
+<span class="s">? Services to onboard:      </span><span class="v">all</span>  <span class="c"># or comma-separated list</span>
+
+<span class="c"># Output: all files written to disk across all repos</span>
+<span class="c"># Raise one PR per repo — review and merge</span></pre>
+  </section>
+
+  <!-- ──────────── WINS ───────────────────────────────────── -->
+  <section>
+    <div class="section-label">Real World Win</div>
+    <div class="section-title">NIPL Prod — First use of this skill</div>
+    <div class="section-desc">The NIPL (National Payments Corporation of India) production environment was the first full onboarding this skill was built from. Here's what that looked like.</div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;">
+        <div style="font-size:32px;font-weight:700;color:var(--accent);">13</div>
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Services Onboarded</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;">
+        <div style="font-size:32px;font-weight:700;color:var(--accent);">2</div>
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Clusters (blue + green)</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;">
+        <div style="font-size:32px;font-weight:700;color:var(--danger);">3 days</div>
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Manual effort (before)</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;">
+        <div style="font-size:32px;font-weight:700;color:var(--accent2);">1 session</div>
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">With skill (after)</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Cell &amp; Infrastructure</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:8px;">
+            <span style="color:var(--muted);">Cell ID</span>
+            <code style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 8px;color:var(--purple);font-family:'SF Mono',Consolas,monospace;font-size:12px;">rzpx-insw-pd01</code>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:8px;">
+            <span style="color:var(--muted);">Cluster</span>
+            <code style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 8px;color:var(--purple);font-family:'SF Mono',Consolas,monospace;font-size:12px;">rzpx-insw-pd01-mum-ncde-blue</code>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:8px;">
+            <span style="color:var(--muted);">Regulatory Body</span>
+            <span style="font-size:13px;">NPCI (National Payments Corporation of India)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:8px;">
+            <span style="color:var(--muted);">Internal Domain</span>
+            <code style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 8px;color:var(--purple);font-family:'SF Mono',Consolas,monospace;font-size:12px;">int.prod.nipl.razorpayupis.com</code>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:var(--muted);">Org ID / Prefix</span>
+            <code style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 8px;color:var(--purple);font-family:'SF Mono',Consolas,monospace;font-size:12px;">191171 / CRZ</code>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">PRs Raised</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:10px;">
+            <span style="min-width:6px;height:6px;border-radius:50%;background:var(--accent2);margin-top:6px;display:block;"></span>
+            <div><span style="font-weight:600;">upi-switch #4034</span> — TOML configs for all 13 services</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:10px;">
+            <span style="min-width:6px;height:6px;border-radius:50%;background:var(--accent2);margin-top:6px;display:block;"></span>
+            <div><span style="font-weight:600;">kube-manifests</span> — values.yaml for all namespaces, both clusters</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;border-bottom:1px solid var(--border);padding-bottom:10px;">
+            <span style="min-width:6px;height:6px;border-radius:50%;background:var(--accent2);margin-top:6px;display:block;"></span>
+            <div><span style="font-weight:600;">spinacode</span> — canary configs + pipeline JSONs, orchestrator entry</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;">
+            <span style="min-width:6px;height:6px;border-radius:50%;background:var(--accent2);margin-top:6px;display:block;"></span>
+            <div><span style="font-weight:600;">Vishnu #17285, #17188, #16157</span> — cluster, infra, DNS records</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:16px;">gRPC Dependency-Ordered Deploy Sequence (NIPL)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <span style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">customer</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">fundsource</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">vpa</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">payment</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">mandate</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">auth</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">complaint</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">settlement</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">acquiring</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">servenpci</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">gateway-npci</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">notification</span>
+        <span style="color:var(--muted);font-size:16px;">→</span>
+        <span style="background:rgba(188,140,255,0.1);border:1px solid rgba(188,140,255,0.25);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;">datastream</span>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(88,166,255,0.3);display:inline-block;"></span>API service</span>
+        <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(210,153,34,0.3);display:inline-block;"></span>API + Worker</span>
+        <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(188,140,255,0.3);display:inline-block;"></span>Worker only</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────── ROADMAP ─────────────────────────────────── -->
+  <section>
+    <div class="section-label">Roadmap</div>
+    <div class="section-title">What's next</div>
+    <div class="roadmap">
+      <div class="roadmap-item now">
+        <div class="roadmap-tag">Now</div>
+        <h4>File Generation</h4>
+        <p>All 7 file types generated and written to disk in one session. Pitfall guardrails active. Dependency-ordered deploy sequence built in.</p>
+      </div>
+      <div class="roadmap-item next">
+        <div class="roadmap-tag">Next</div>
+        <h4>Auto-PR Creation</h4>
+        <p>Skill opens PRs to all repos automatically after file generation — no manual PR raising needed. Review and approve from your queue.</p>
+      </div>
+      <div class="roadmap-item later">
+        <div class="roadmap-tag">Later</div>
+        <h4>Green Cluster Cutover</h4>
+        <p>Automated traffic shift from blue to green cluster — orchestrated cutover with health checks and rollback safety gates.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  New Environment Onboarding &nbsp;·&nbsp; Claude Agent Skill &nbsp;·&nbsp; Built from real production onboarding learnings
+</footer>
+
+</body>
+</html>
